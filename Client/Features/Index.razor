@@ -1,0 +1,55 @@
+﻿@page "/"
+@using DynamicDashboards.Shared
+@inject WidgetApi WidgetApi
+@inject IDashboardApi DashboardApi
+
+<h2>Widgets</h2>
+@foreach (var widget in availableWidgets)
+{
+    <p>
+        @widget <button @onclick="@(() => AddWidget(widget))">Add</button>
+    </p>
+}
+
+<h2>Dashboard</h2>
+@foreach (var component in resolvedComponents.Where(x => x.ResolvedType != null))
+{
+    <button @onclick="@(() => RemoveWidget(component))">Remove</button>
+    <DynamicComponent Type="component.ResolvedType"/>
+}
+
+@code {
+
+    private IEnumerable<ComponentModel> resolvedComponents = Enumerable.Empty<ComponentModel>();
+    private IEnumerable<string> availableWidgets;
+    private DashboardModel dashboard;
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableWidgets = WidgetApi.ListAll();
+        await ReloadBoard();
+    }
+
+    private async Task ReloadBoard()
+    {
+        dashboard = await DashboardApi.GetDashboards();
+        resolvedComponents = dashboard.Panels.Select(x => new ComponentModel(x.Title, x.ComponentType, x.Id));
+    }
+
+    private async Task AddWidget(string widgetType)
+    {
+        await DashboardApi.AddPanel(new AddPanelCommand
+        {
+            Title = "test",
+            Type = widgetType
+        });
+        await ReloadBoard();
+    }
+
+    private async Task RemoveWidget(ComponentModel component)
+    {
+        await DashboardApi.DeletePanel(dashboard.Id, component.Id);
+        await ReloadBoard();
+    }
+
+}
