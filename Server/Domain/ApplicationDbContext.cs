@@ -16,4 +16,5 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Dashboard>()
             .HasMany<Panel>();
     }
+
 }

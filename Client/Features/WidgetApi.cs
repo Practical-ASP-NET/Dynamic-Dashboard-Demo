@@ -5,7 +5,13 @@ namespace DynamicDashboards.Client.Features;
 
 public class WidgetApi
 {
-    public IEnumerable<string?> ListAll()
+    public class WidgetModel
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+    }
+    
+    public IEnumerable<WidgetModel?> ListAll()
     {
         var widgets = Assembly.GetExecutingAssembly()
             .GetTypes()
@@ -13,6 +19,6 @@ public class WidgetApi
                         && x.Namespace == "DynamicDashboards.Client.Features.Widgets"
                         && x.BaseType == typeof(ComponentBase));
         
-        return widgets.Select(x => x.FullName);
+        return widgets.Select(x => new WidgetModel{Name = x.Name, Type = x.FullName});
     }
 }

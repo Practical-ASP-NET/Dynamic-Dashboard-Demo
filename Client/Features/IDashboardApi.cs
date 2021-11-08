@@ -5,12 +5,12 @@ namespace DynamicDashboards.Client.Features;
 
 public interface IDashboardApi
 {
-    [Get("/dashboard")]
+    [Get("/api/dashboard")]
     public Task<DashboardModel> GetDashboards();
 
-    [Put("/dashboard/panel")]
+    [Put("/api/dashboard/panel")]
     public Task AddPanel(AddPanelCommand command);
 
-    [Delete("/dashboard/{dashboardId}/panel/{panelId}")]
+    [Delete("/api/dashboard/{dashboardId}/panel/{panelId}")]
     public Task DeletePanel(int dashboardId, int panelId);
 }

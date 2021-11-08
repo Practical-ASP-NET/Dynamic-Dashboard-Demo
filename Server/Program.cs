@@ -29,6 +29,8 @@ else
     app.UseHsts();
 }
 
+await MigrateDB(app);
+
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
@@ -36,27 +38,40 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapGet("dashboard", async ([FromServices] DashboardQuery query) => await query.Execute());
-app.MapPut("dashboard/panel",
+app.MapGet("api/dashboard", async ([FromServices] DashboardQuery query) => await query.Execute());
+app.MapPut("api/dashboard/panel",
     async (HttpContext ctx, [FromBody] AddPanelCommand panel, [FromServices] AddPanelCommandHandler command) =>
     {
         var id = await command.Execute(panel);
         return Results.Created($"{ctx.Request.GetDisplayUrl()}/{id}", null);
     });
 
-app.MapDelete("dashboard/{dashboardId}/panel/{panelId}", async ([FromServices] ApplicationDbContext dbContext, int dashboardId, int panelId) =>
-{
-    var dashboard = await dbContext.Dashboards
-        .Include(x => x.Panels)
-        .FirstOrDefaultAsync(x => x.Id == dashboardId);
+app.MapDelete("api/dashboard/{dashboardId}/panel/{panelId}",
+    async ([FromServices] ApplicationDbContext dbContext, int dashboardId, int panelId) =>
+    {
+        var dashboard = await dbContext.Dashboards
+            .Include(x => x.Panels)
+            .FirstOrDefaultAsync(x => x.Id == dashboardId);
 
-    if (dashboard == null) return Results.NotFound();
-    
-    dashboard.RemovePanel(panelId);
-    await dbContext.SaveChangesAsync();
-    return Results.Ok();
-});
+        if (dashboard == null) return Results.NotFound();
+
+        dashboard.RemovePanel(panelId);
+        await dbContext.SaveChangesAsync();
+        return Results.Ok();
+    });
 
 app.MapFallbackToFile("index.html");
 
 app.Run();
+
+async Task MigrateDB(WebApplication webApplication)
+{
+    var scope = app
+        .Services.GetRequiredService<IServiceScopeFactory>()
+        .CreateScope();
+    
+    await using var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+
+    if (context != null)
+        await context.Database.MigrateAsync();
+}

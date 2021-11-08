@@ -3,25 +3,47 @@
 @inject WidgetApi WidgetApi
 @inject IDashboardApi DashboardApi
 
-<h2>Widgets</h2>
+<h2 class="text-2xl mb-2">Widgets</h2>
+
 @foreach (var widget in availableWidgets)
 {
-    <p>
-        @widget <button @onclick="@(() => AddWidget(widget))">Add</button>
-    </p>
+    <div class="text-lg flex justify-between w-52">
+        <span>@widget.Name</span> 
+        <button class="underline" @onclick="@(() => AddWidget(widget.Type))">Add</button>
+    </div>
 }
-
-<h2>Dashboard</h2>
-@foreach (var component in resolvedComponents.Where(x => x.ResolvedType != null))
-{
-    <button @onclick="@(() => RemoveWidget(component))">Remove</button>
-    <DynamicComponent Type="component.ResolvedType"/>
-}
+<hr class="mt-6"/>
+<h2 class="text-2xl my-4">Dashboard</h2>
+<div class="flex flex-row flex-wrap gap-4">
+    
+    @if (resolvedComponents.Any(x => x.ResolvedType != null))
+    {
+        @foreach (var component in resolvedComponents.Where(x => x.ResolvedType != null))
+        {
+            <div class="flex flex-col w-96">
+                <div class="p-4 border rounded-md flex-1">
+                    <DynamicComponent Type="component.ResolvedType"/>
+                </div>
+                <button class="mt-2 rounded-md p-2 bg-red-500 text-white" @onclick="@(() => RemoveWidget(component))">
+                    Remove
+                </button>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-lg text-red-500">
+            Nothing to see here! Try adding some widgets from the list above.
+        </p>
+    }
+    
+    
+</div>
 
 @code {
 
     private IEnumerable<ComponentModel> resolvedComponents = Enumerable.Empty<ComponentModel>();
-    private IEnumerable<string> availableWidgets;
+    private IEnumerable<WidgetApi.WidgetModel?> availableWidgets;
     private DashboardModel dashboard;
 
     protected override async Task OnInitializedAsync()

@@ -16,6 +16,6 @@ public class ComponentModel
 
     private Type? TryResolveType(string? typeString)
     {
-        return Type.GetType($"{typeString}");
+        return typeString == null ? null : Type.GetType(typeString);
     }
 }
