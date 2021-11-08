@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace DynamicDashboards.Client.Features;
 
-public class WidgetApi
+public class WidgetLocator
 {
     public class WidgetModel
     {
@@ -11,7 +11,7 @@ public class WidgetApi
         public string Type { get; set; }
     }
     
-    public IEnumerable<WidgetModel?> ListAll()
+    public IEnumerable<WidgetModel?> FindAll()
     {
         var widgets = Assembly.GetExecutingAssembly()
             .GetTypes()

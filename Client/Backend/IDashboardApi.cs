@@ -1,7 +1,7 @@
 using DynamicDashboards.Shared;
 using Refit;
 
-namespace DynamicDashboards.Client.Features;
+namespace DynamicDashboards.Client.Backend;
 
 public interface IDashboardApi
 {

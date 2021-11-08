@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using DynamicDashboards.Shared
-@inject WidgetApi WidgetApi
+@using DynamicDashboards.Client.Backend
+@inject WidgetLocator _widgetLocator
 @inject IDashboardApi DashboardApi
 
 <h2 class="text-2xl mb-2">Widgets</h2>
@@ -8,17 +9,17 @@
 @foreach (var widget in availableWidgets)
 {
     <div class="text-lg flex justify-between w-52">
-        <span>@widget.Name</span> 
+        <span>@widget.Name</span>
         <button class="underline" @onclick="@(() => AddWidget(widget.Type))">Add</button>
     </div>
 }
 <hr class="mt-6"/>
 <h2 class="text-2xl my-4">Dashboard</h2>
 <div class="flex flex-row flex-wrap gap-4">
-    
-    @if (resolvedComponents.Any(x => x.ResolvedType != null))
+
+    @if (resolvedComponents.Any())
     {
-        @foreach (var component in resolvedComponents.Where(x => x.ResolvedType != null))
+        @foreach (var component in resolvedComponents)
         {
             <div class="flex flex-col w-96">
                 <div class="p-4 border rounded-md flex-1">
@@ -36,26 +37,28 @@
             Nothing to see here! Try adding some widgets from the list above.
         </p>
     }
-    
-    
+
+
 </div>
 
 @code {
 
     private IEnumerable<ComponentModel> resolvedComponents = Enumerable.Empty<ComponentModel>();
-    private IEnumerable<WidgetApi.WidgetModel?> availableWidgets;
+    private IEnumerable<WidgetLocator.WidgetModel?> availableWidgets;
     private DashboardModel dashboard;
 
     protected override async Task OnInitializedAsync()
     {
-        availableWidgets = WidgetApi.ListAll();
+        availableWidgets = _widgetLocator.FindAll();
         await ReloadBoard();
     }
 
     private async Task ReloadBoard()
     {
         dashboard = await DashboardApi.GetDashboards();
-        resolvedComponents = dashboard.Panels.Select(x => new ComponentModel(x.Title, x.ComponentType, x.Id));
+        resolvedComponents = dashboard.Panels
+            .Select(x => new ComponentModel(x.Title, x.ComponentType, x.Id))
+            .Where(x => x.ResolvedType != null);
     }
 
     private async Task AddWidget(string widgetType)
