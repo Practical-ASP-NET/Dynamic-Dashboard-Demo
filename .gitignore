@@ -31,3 +31,7 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 /.idea/
+/Server/dashboard
+/Server/dashboard.sqlite
+/Server/dashboard.sqlite-shm
+/Server/dashboard.sqlite-wal
