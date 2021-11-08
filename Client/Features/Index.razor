@@ -6,13 +6,27 @@
 
 <h2 class="text-2xl mb-2">Widgets</h2>
 
-@foreach (var widget in availableWidgets)
-{
-    <div class="text-lg flex justify-between w-52">
-        <span>@widget.Name</span>
-        <button class="underline" @onclick="@(() => AddWidget(widget.Type))">Add</button>
+<div class="flex flex-row gap-8">
+    <div class="p-4 border rounded">
+        @foreach (var widget in availableWidgets)
+        {
+            <div class="text-lg flex justify-between w-52">
+                <span>@widget.Name</span>
+                <button class="underline" @onclick="@(() => AddWidget(widget.Type))">Add</button>
+            </div>
+        }
     </div>
-}
+    <div class="p-4 border rounded">
+        <h3>Want more widgets?</h3>
+        <p class="my-2">Here's how:</p>
+        <ol class="list-inside list-decimal leading-relaxed">
+            <li>Create a new Blazor component in the <strong>Features\Widgets</strong> folder</li>
+            <li>Rebuild the app</li>
+            <li>Marvel as the component appears in the list :)</li>
+        </ol>
+    </div>
+</div>
+
 <hr class="mt-6"/>
 <h2 class="text-2xl my-4">Dashboard</h2>
 <div class="flex flex-row flex-wrap gap-4">
